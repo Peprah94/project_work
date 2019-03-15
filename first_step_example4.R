@@ -200,8 +200,8 @@ yhattest=predict(fit2,newx=dmattest,s=bestlambda1)
 testrmse2[k]=sqrt(mean((Ytest-yhattest)^2))
 }
 testrmse2
-data <- data.frame(cnt, testrmse2)
-write.csv(data, "counts.csv")
+data <- data.frame(maxi, testrmse2)
+write.csv(data, "maxi.csv")
 
 #fit2
 #bb <- t(t(as.matrix(fit2$beta)[, which(fit2$lambda == bestlambda1)]))
