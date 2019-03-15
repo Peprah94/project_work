@@ -200,7 +200,7 @@ bestlambda1=lambdas[which.min(rmse)]
 
 yhattest=predict(fit2,newx=dmattest,s=bestlambda1)
 testrmse2[k]=sqrt(mean((Ytest-yhattest)^2))
-
+}
 testrmse2
 data <- data.frame(maxwords, testrmse2)
 write.csv(data, "maxwords.csv")
