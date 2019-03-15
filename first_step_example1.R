@@ -84,7 +84,7 @@ str(it)
 # then it is a 
 
 vect <- create_vocabulary(it, ngram = c(1, 1), stopwords = stopwords("ru")) %>%
-  prune_vocabulary(term_count_min = 3, doc_proportion_max = 0.4, vocab_term_max = 12500) %>% 
+  prune_vocabulary(term_count_min = 3, doc_proportion_max = 0.4, vocab_term_max = maxwords[k]) %>% 
   vocab_vectorizer()
 
 str(vect)
