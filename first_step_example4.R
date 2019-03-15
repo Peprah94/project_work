@@ -19,7 +19,7 @@ Sys.setlocale(locale="ru_RU") # show russian words
 # will not use test set, loading only training data
 
 cat("Reading data...\n")
-tr <- read_csv("C:/Users/kayte/OneDrive/Desktop/KADPC/train.csv") 
+tr <- read_csv("C:/lustre1/projects/fs_ma8701_1/avito/train.csv")  
 
 #---------------------------
 cat("Preprocessing...\n")
