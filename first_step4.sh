@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=20
 #SBATCH --gres=gpu:1
 #SBATCH --job-name="first_step_4"
-#SBATCH --output=first step 4
+#SBATCH --output=first_step_4
 #SBATCH --partition=EPICALL
 
 cd /home/kwakupa/project_work/
