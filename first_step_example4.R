@@ -183,7 +183,7 @@ testrmse # not really winning anything here, but, a good start :-)
 
 # lots to check out next, transforming the Y? and adding other covs?
 
-fit2=glmnet(x=dmattr,y=Ytr,standardize = FALSE, alpha =alp[j]) #since weighted?
+fit2=glmnet(x=dmattr,y=Ytr,standardize = FALSE, alpha =1) #since weighted?
 lambdas=fit2$lambda
 rmse=rep(NA,length.out=length(lambdas))
 for (i in 1:length(lambdas))
