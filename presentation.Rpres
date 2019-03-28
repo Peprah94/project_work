@@ -1,0 +1,45 @@
+presentation
+========================================================
+author: 
+date: 
+autosize: true
+
+First Slide
+========================================================
+
+
+```{r echo=FALSE}
+library(readr)
+library(ggplot2)
+alphas <- read_csv("C:/Users/kayte/OneDrive/Desktop/project_work/alphas.csv")
+counts <- read_csv("C:/Users/kayte/OneDrive/Desktop/project_work/counts.csv")
+maxwords <- read_csv("C:/Users/kayte/OneDrive/Desktop/project_work/maxwords.csv")
+maxi <- read_csv("C:/Users/kayte/OneDrive/Desktop/project_work/maxi.csv")
+ggplot(alphas, mapping = aes(x=alp, y=testrmse2))+
+  geom_point()+
+  geom_line()+
+  labs(x="alpha", y="test rmse")+
+  ggtitle("Ridge, Lasso and Elastic net")
+ggplot(counts, mapping = aes(x=cnt, y=testrmse2))+
+  geom_point()+
+  geom_line()+
+  labs(x="count", y="test rmse")+
+  ggtitle("Minimum term count")
+
+```
+
+Are there any hyperparameters?
+=========================================================
+```{r echo = FALSE}
+ggplot(maxwords, mapping = aes(x=maxwords, y=testrmse2))+
+  geom_point()+
+  geom_line()+
+  labs(x="maxwords", y="test rmse")+
+  ggtitle("Vocabulary term maximum")
+ggplot(maxi, mapping = aes(x=maxi, y=testrmse2))+
+  geom_point()+
+  geom_line()+
+  labs(x="maxi", y="test rmse")+
+  ggtitle("Document Proportion maximum")
+```
+
