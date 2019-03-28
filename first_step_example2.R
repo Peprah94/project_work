@@ -26,11 +26,12 @@ cat("Preprocessing...\n")
 
 # here you may add other stuff than this (the commented-out ones are from the recommended kernel)
 
+tr$price[is.na(tr$price)]=0
 trpre <- tr %>% mutate(no_img = is.na(image) %>% as.integer(),
                        no_dsc = is.na(description) %>% as.integer(),
-                       # no_p1 = is.na(param_1) %>% as.integer(), 
-                       # no_p2 = is.na(param_2) %>% as.integer(), 
-                       # no_p3 = is.na(param_3) %>% as.integer(),
+                       no_p1 = is.na(param_1) %>% as.integer(), 
+                       no_p2 = is.na(param_2) %>% as.integer(), 
+                       no_p3 = is.na(param_3) %>% as.integer(),
                        # titl_len = str_length(title),
                        # desc_len = str_length(description),
                        # titl_capE = str_count(title, "[A-Z]"),
@@ -56,7 +57,7 @@ trpre <- tr %>% mutate(no_img = is.na(image) %>% as.integer(),
                        txt = paste(title, description, sep = " "), # treating title and description together
                        mday = mday(activation_date), #day of the month
                        wday = wday(activation_date)) %>%  # day of the week
-  select(user_id,region, city, parent_category_name,user_type,no_img,no_dsc,txt,mday,wday,deal_probability)
+  select(no_p1,no_p2, no_p3,price, region, city, parent_category_name,user_type,no_img,no_dsc,txt,mday,wday,deal_probability)
 # replace_na(list(image_top_1 = -1, price = -1, 
 #                 param_1 = -1, param_2 = -1, param_3 = -1, 
 #                 desc_len = 0, desc_cap = 0, desc_pun = 0, 
@@ -69,9 +70,9 @@ gc()
 #---------------------------
 # how to represent the txt using bag of words (from Part 1)
 cat("Parsing text...\n")
-#maxwords <- seq(5000, 15000, 1000)
-#testrmse2 <- vector("numeric", length(maxwords))
-#for(k in 1:length(maxwords)){
+maxi <- seq(0.1, 1, 0.1)
+testrmse2 <- vector("numeric", length(maxi))
+for(k in 1:length(maxi)){
 it <- trpre %$%
   str_to_lower(txt) %>%
   str_replace_all("[^[:alpha:]]", " ") %>%
@@ -84,7 +85,7 @@ str(it)
 # then it is a 
 
 vect <- create_vocabulary(it, ngram = c(1, 1), stopwords = stopwords("ru")) %>%
-  prune_vocabulary(term_count_min = 3, doc_proportion_max = 0.4, vocab_term_max = 12500) %>% 
+  prune_vocabulary(term_count_min = 3, doc_proportion_max = maxi[k], vocab_term_max = 12500) %>% 
   vocab_vectorizer()
 
 str(vect)
@@ -116,9 +117,6 @@ idrest=1:1127569
 # the true test is kept in vault now, and not looked at for a while!
 
 set.seed(8701)
-alp <- seq(0,1, 0.1)
-testrmse2 <- vector("numeric", length(alp))
-for(j in 1:length(alp)){
 randtrain=sample(idrest,1e5)
 randvalid=sample(setdiff(idrest,randtrain),1e5)
 randtest=sample(setdiff(idrest,union(randtrain,randvalid)),1e5)
@@ -186,7 +184,7 @@ testrmse # not really winning anything here, but, a good start :-)
 
 # lots to check out next, transforming the Y? and adding other covs?
 
-fit2=glmnet(x=dmattr,y=Ytr,standardize = FALSE, alpha =alp[j]) #since weighted?
+fit2=glmnet(x=dmattr,y=Ytr,standardize = FALSE, alpha =1) #since weighted?
 lambdas=fit2$lambda
 rmse=rep(NA,length.out=length(lambdas))
 for (i in 1:length(lambdas))
@@ -200,11 +198,11 @@ plot(lambdas,rmse)
 bestlambda1=lambdas[which.min(rmse)]
 
 yhattest=predict(fit2,newx=dmattest,s=bestlambda1)
-testrmse2[j]=sqrt(mean((Ytest-yhattest)^2))
+testrmse2[k]=sqrt(mean((Ytest-yhattest)^2))
 }
 testrmse2
-data <- data.frame(alp, testrmse2)
-write.csv(data, "alphas.csv")
+data <- data.frame(maxi, testrmse2)
+write.csv(data, "maxi1.csv")
 
 #fit2
 #bb <- t(t(as.matrix(fit2$beta)[, which(fit2$lambda == bestlambda1)]))

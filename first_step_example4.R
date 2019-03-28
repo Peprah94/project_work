@@ -25,11 +25,11 @@ tr <- read_csv("/lustre1/projects/fs_ma8701_1/avito/train.csv")
 cat("Preprocessing...\n")
 
 # here you may add other stuff than this (the commented-out ones are from the recommended kernel)
-
+tr$price[is.na(tr$price)]=0
 trpre <- tr %>% mutate(no_img = is.na(image) %>% as.integer(),
                        no_dsc = is.na(description) %>% as.integer(),
-                       # no_p1 = is.na(param_1) %>% as.integer(), 
-                       # no_p2 = is.na(param_2) %>% as.integer(), 
+                       no_p1 = is.na(param_1) %>% as.integer(), 
+                       no_p2 = is.na(param_2) %>% as.integer(), 
                        # no_p3 = is.na(param_3) %>% as.integer(),
                        # titl_len = str_length(title),
                        # desc_len = str_length(description),
@@ -56,7 +56,7 @@ trpre <- tr %>% mutate(no_img = is.na(image) %>% as.integer(),
                        txt = paste(title, description, sep = " "), # treating title and description together
                        mday = mday(activation_date), #day of the month
                        wday = wday(activation_date)) %>%  # day of the week
-  select(user_id,region, city, parent_category_name,user_type,no_img,no_dsc,txt,mday,wday,deal_probability)
+  select(no_p1, no_p2, no_p3,price,region, city, parent_category_name,user_type,no_img,no_dsc,txt,mday,wday,deal_probability)
 # replace_na(list(image_top_1 = -1, price = -1, 
 #                 param_1 = -1, param_2 = -1, param_3 = -1, 
 #                 desc_len = 0, desc_cap = 0, desc_pun = 0, 
@@ -69,9 +69,9 @@ gc()
 #---------------------------
 # how to represent the txt using bag of words (from Part 1)
 cat("Parsing text...\n")
-maxi <- seq(0.1, 1, 0.1)
-testrmse2 <- vector("numeric", length(maxi))
-for(k in 1:length(maxi)){
+maxwords <- seq(5000, 15000, 1000)
+testrmse2 <- vector("numeric", length(maxwords))
+for(k in 1:length(maxwords)){
 it <- trpre %$%
   str_to_lower(txt) %>%
   str_replace_all("[^[:alpha:]]", " ") %>%
@@ -84,7 +84,7 @@ str(it)
 # then it is a 
 
 vect <- create_vocabulary(it, ngram = c(1, 1), stopwords = stopwords("ru")) %>%
-  prune_vocabulary(term_count_min = 3, doc_proportion_max = maxi[k], vocab_term_max = 12500) %>% 
+  prune_vocabulary(term_count_min = 3, doc_proportion_max = 0.4, vocab_term_max = maxwords[k]) %>% 
   vocab_vectorizer()
 
 str(vect)
@@ -200,8 +200,8 @@ yhattest=predict(fit2,newx=dmattest,s=bestlambda1)
 testrmse2[k]=sqrt(mean((Ytest-yhattest)^2))
 }
 testrmse2
-data <- data.frame(maxi, testrmse2)
-write.csv(data, "maxi.csv")
+data <- data.frame(maxwords, testrmse2)
+write.csv(data, "maxwords2.csv")
 
 #fit2
 #bb <- t(t(as.matrix(fit2$beta)[, which(fit2$lambda == bestlambda1)]))
